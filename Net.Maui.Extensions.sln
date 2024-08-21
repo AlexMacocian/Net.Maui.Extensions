@@ -5,6 +5,18 @@ VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Net.Maui.Extensions", "Net.Maui.Extensions\Net.Maui.Extensions.csproj", "{518D6700-2583-4743-A015-C142E33AF3AC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{617BD830-6D10-4FE9-82FB-9880CEC683D4}"
+	ProjectSection(SolutionItems) = preProject
+		.github\CODEOWNERS = .github\CODEOWNERS
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{FBF28286-4693-460F-A13B-59EA80B1F98F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\cd.yaml = .github\workflows\cd.yaml
+		.github\workflows\ci.yaml = .github\workflows\ci.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +32,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FBF28286-4693-460F-A13B-59EA80B1F98F} = {617BD830-6D10-4FE9-82FB-9880CEC683D4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDFE725F-2E85-450E-9A22-39587AE90B13}
