@@ -36,7 +36,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.1
+      uses: microsoft/setup-msbuild@v2.0.0
 
     - name: Restore project
       run: msbuild $env:Solution_Path /t:Restore /p:Configuration=$env:Configuration /p:RuntimeIdentifier=$env:RuntimeIdentifier
