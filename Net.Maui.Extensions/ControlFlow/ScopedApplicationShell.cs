@@ -2,11 +2,11 @@
 
 namespace Net.Maui.Extensions.ControlFlow;
 
-internal class ScopedApplicationShell : Shell
+public class ScopedApplicationShell : Shell
 {
     private readonly IServiceProvider serviceProvider;
 
-    public ScopedApplicationShell(
+    internal ScopedApplicationShell(
         IServiceProvider serviceProvider)
     {
         this.serviceProvider = serviceProvider.ThrowIfNull();

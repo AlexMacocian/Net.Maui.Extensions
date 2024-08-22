@@ -56,7 +56,8 @@ public static class MauiAppBuilderExtensions
     public static MauiAppBuilder WithNavigation(this MauiAppBuilder appBuilder)
     {
         appBuilder.ThrowIfNull();
-        appBuilder.Services.AddScoped<Shell, ScopedApplicationShell>(sp => new ScopedApplicationShell(sp));
+        appBuilder.Services.AddScoped<ScopedApplicationShell, ScopedApplicationShell>(sp => new ScopedApplicationShell(sp));
+        appBuilder.Services.AddScoped<Shell, ScopedApplicationShell>(sp => sp.GetRequiredService<ScopedApplicationShell>());
         appBuilder.Services.AddScoped<INavigationService, NavigationService>();
 
         return appBuilder;
