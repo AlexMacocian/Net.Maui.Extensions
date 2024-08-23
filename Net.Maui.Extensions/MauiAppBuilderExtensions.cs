@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Net.Maui.Extensions.Attributes;
 using Net.Maui.Extensions.Context;
 using Net.Maui.Extensions.ControlFlow;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Reflection;
 
 namespace Net.Maui.Extensions;
@@ -46,19 +48,18 @@ public static class MauiAppBuilderExtensions
         return appBuilder;
     }
 
-    public static MauiAppBuilder WithExtendedApp<T>(this MauiAppBuilder appBuilder)
-        where T : ExtendedApplication
+    public static MauiAppBuilder WithExtendedApp<TApp, TMainPage>(this MauiAppBuilder appBuilder)
+        where TApp : ExtendedApplication, IMainPagePresenter<TMainPage>
+        where TMainPage : ContentPage
     {
-        appBuilder.ThrowIfNull().UseMauiApp<T>();
+        appBuilder.ThrowIfNull().UseMauiApp<TApp>();
         return appBuilder;
     }
 
     public static MauiAppBuilder WithNavigation(this MauiAppBuilder appBuilder)
     {
         appBuilder.ThrowIfNull();
-        appBuilder.Services.AddScoped<ScopedApplicationShell, ScopedApplicationShell>(sp => new ScopedApplicationShell(sp));
-        appBuilder.Services.AddScoped<Shell, ScopedApplicationShell>(sp => sp.GetRequiredService<ScopedApplicationShell>());
-        appBuilder.Services.AddScoped<INavigationService, NavigationService>();
+        appBuilder.Services.AddSingleton<INavigationService, NavigationService>(sp => new NavigationService(sp, sp.GetRequiredService<ILogger<NavigationService>>()));
 
         return appBuilder;
     }

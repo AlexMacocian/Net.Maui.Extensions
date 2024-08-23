@@ -1,54 +1,106 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Core.Extensions;
+using System.Extensions;
 using System.Extensions.Core;
 
 namespace Net.Maui.Extensions.ControlFlow;
 
 internal sealed class NavigationService : INavigationService
 {
-    private readonly ScopedApplicationShell scopedApplicationShell;
+    private readonly Stack<ScopedPageContext> modalStack = new();
+    private readonly Stack<ScopedPageContext> navigationStack = new();
+    private readonly IServiceProvider serviceProvider;
     private readonly ILogger<NavigationService> logger;
 
+    private ExtendedApplication? extendedApplication;
+
     public NavigationService(
-        ScopedApplicationShell scopedApplicationShell,
+        IServiceProvider serviceProvider,
         ILogger<NavigationService> logger)
     {
-        this.scopedApplicationShell = scopedApplicationShell.ThrowIfNull();
+        this.serviceProvider = serviceProvider.ThrowIfNull();
         this.logger = logger.ThrowIfNull();
     }
 
-    public async Task GoBack(bool animated = false)
+    public void GoBack(bool animated = false)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Going back");
-        await this.scopedApplicationShell.Navigation.PopAsync(animated);
+        if (this.navigationStack.Count <= 1)
+        {
+            scopedLogger.LogError("Cannot go back. Navigation stack is at root");
+            return;
+        }
+
+        scopedLogger.LogDebug("Going back");
+        if (this.navigationStack.TryPop(out var context))
+        {
+            context.Scope?.Dispose();
+        }
+
+        this.ShowCurrentPage();
     }
 
-    public async Task GoBackModal(bool animated = false)
+    public void GoBackToRoot(bool animated = false)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Going back");
-        await this.scopedApplicationShell.Navigation.PopModalAsync(animated);
+        scopedLogger.LogDebug("Going back to root");
+        while (this.navigationStack.Count > 1 && this.navigationStack.TryPop(out var context))
+        {
+            context.Scope?.Dispose();
+        }
+
+        this.ShowCurrentPage();
     }
 
-    public async Task GoBackToRoot(bool animated = false)
+    public void GoTo<T>(bool animated = false) where T : ContentPage
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation("Going back to root");
-        await this.scopedApplicationShell.Navigation.PopToRootAsync(animated);
+        scopedLogger.LogDebug($"Going to {typeof(T).Name}");
+
+        var context = this.GetScopedPageAndProvider<T>();
+        this.navigationStack.Push(context);
+        this.ShowCurrentPage();
     }
 
-    public async Task GoTo<T>(bool animated = false) where T : ContentPage
+    public void SetNavigationRoot(ExtendedApplication extendedApplication, Type rootPageType)
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation($"Going to {typeof(T).Name}");
-        await this.scopedApplicationShell.PushScoped<T>();
+        scopedLogger.LogDebug($"Setting navigation root {rootPageType.Name}");
+
+        this.extendedApplication = extendedApplication.ThrowIfNull();
+        var context = this.GetScopedPageAndProvider(rootPageType);
+        this.navigationStack.Push(context);
+        this.ShowCurrentPage();
     }
 
-    public async Task GoToModal<T>(bool animated = false) where T : ContentPage
+    private void ShowCurrentPage()
     {
-        var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogInformation($"Going to {typeof(T).Name}");
-        await this.scopedApplicationShell.PushModalScoped<T>();
+        if (this.extendedApplication is null)
+        {
+            return;
+        }
+
+        if (this.navigationStack.TryPeek(out var currentContext))
+        {
+            this.extendedApplication.MainPage = currentContext.Page;
+        }
+    }
+
+    private ScopedPageContext GetScopedPageAndProvider<T>()
+        where T : ContentPage
+    {
+        var scope = this.serviceProvider.CreateScope();
+        return new ScopedPageContext { Page = scope.ServiceProvider.GetRequiredService<T>(), Scope = scope };
+    }
+
+    private ScopedPageContext GetScopedPageAndProvider(Type type)
+    {
+        if (!type.IsAssignableTo(typeof(ContentPage)))
+        {
+            throw new InvalidOperationException($"{type.Name} must be of type {nameof(ContentPage)}");
+        }
+
+        var scope = this.serviceProvider.CreateScope();
+        return new ScopedPageContext { Page = scope.ServiceProvider.GetRequiredService(type).Cast<ContentPage>(), Scope = scope };
     }
 }
