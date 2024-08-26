@@ -22,7 +22,7 @@ internal sealed class NavigationService : INavigationService
         this.logger = logger.ThrowIfNull();
     }
 
-    public void GoBack(bool animated = false)
+    public void GoBack()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         if (this.navigationStack.Count <= 1)
@@ -40,7 +40,7 @@ internal sealed class NavigationService : INavigationService
         this.ShowCurrentPage();
     }
 
-    public void GoBackToRoot(bool animated = false)
+    public void GoBackToRoot()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug("Going back to root");
@@ -52,7 +52,7 @@ internal sealed class NavigationService : INavigationService
         this.ShowCurrentPage();
     }
 
-    public void GoTo<T>(bool animated = false) where T : ContentPage
+    public T GoTo<T>() where T : ContentPage
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug($"Going to {typeof(T).Name}");
@@ -60,6 +60,17 @@ internal sealed class NavigationService : INavigationService
         var context = this.GetScopedPageAndProvider<T>();
         this.navigationStack.Push(context);
         this.ShowCurrentPage();
+        return context.Page?.ThrowIfNull().Cast<T>().ThrowIfNull()!;
+    }
+
+    public ContentPage? GetCurrent()
+    {
+        if (this.navigationStack.TryPeek(out var context))
+        {
+            return context.Page?.ThrowIfNull();
+        }
+
+        return default;
     }
 
     public void SetNavigationRoot(ExtendedApplication extendedApplication, Type rootPageType)

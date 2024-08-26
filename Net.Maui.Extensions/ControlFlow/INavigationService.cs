@@ -2,10 +2,12 @@
 
 public interface INavigationService
 {
-    void GoTo<T>(bool animated = false)
+    ContentPage? GetCurrent();
+
+    T GoTo<T>()
         where T : ContentPage;
 
-    void GoBack(bool animated = false);
+    void GoBack();
 
-    void GoBackToRoot(bool animated = false);
+    void GoBackToRoot();
 }
