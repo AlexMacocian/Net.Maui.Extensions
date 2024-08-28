@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
 using System.Extensions.Core;
@@ -52,15 +53,17 @@ internal sealed class NavigationService : INavigationService
         this.ShowCurrentPage();
     }
 
-    public T GoTo<T>() where T : ContentPage
+    public TPageType GoTo<TPageType, TViewModelType>(TViewModelType? viewModel = default)
+        where TPageType : ContentPage
+        where TViewModelType : INotifyPropertyChanged, new()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
-        scopedLogger.LogDebug($"Going to {typeof(T).Name}");
+        scopedLogger.LogDebug($"Going to {typeof(TPageType).Name}");
 
-        var context = this.GetScopedPageAndProvider<T>();
+        var context = this.GetScopedPageAndProvider<TPageType, TViewModelType>(viewModel ?? new TViewModelType());
         this.navigationStack.Push(context);
         this.ShowCurrentPage();
-        return context.Page?.ThrowIfNull().Cast<T>().ThrowIfNull()!;
+        return context.Page?.ThrowIfNull().Cast<TPageType>().ThrowIfNull()!;
     }
 
     public ContentPage? GetCurrent()
@@ -91,17 +94,20 @@ internal sealed class NavigationService : INavigationService
             return;
         }
 
-        if (this.navigationStack.TryPeek(out var currentContext))
+        if (this.navigationStack.TryPeek(out var currentContext) &&
+            currentContext.Page is not null)
         {
+            currentContext.Page.BindingContext = currentContext.ViewModel;
             this.extendedApplication.MainPage = currentContext.Page;
         }
     }
 
-    private ScopedPageContext GetScopedPageAndProvider<T>()
-        where T : ContentPage
+    private ScopedPageContext GetScopedPageAndProvider<TPageType, TViewModelType>(TViewModelType viewModel)
+        where TPageType : ContentPage
+        where TViewModelType : INotifyPropertyChanged, new()
     {
         var scope = this.serviceProvider.CreateScope();
-        return new ScopedPageContext { Page = scope.ServiceProvider.GetRequiredService<T>(), Scope = scope };
+        return new ScopedPageContext { Page = scope.ServiceProvider.GetRequiredService<TPageType>(), Scope = scope, ViewModel = viewModel };
     }
 
     private ScopedPageContext GetScopedPageAndProvider(Type type)
