@@ -22,13 +22,7 @@ public abstract class ExtendedApplication : Application
         // Find the interface that implements IMainPagePresenter<>
         var interfaceType = currentType
             .GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMainPagePresenter<>));
-
-        if (interfaceType is null)
-        {
-            throw new InvalidOperationException($"{currentType.Name} must implement IMainPagePresenter<TMainPage>");
-        }
-
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMainPagePresenter<>)) ?? throw new InvalidOperationException($"{currentType.Name} must implement IMainPagePresenter<TMainPage>");
         var mainPageType = interfaceType.GetGenericArguments()[0];
         this.navigationService.Cast<NavigationService>().SetNavigationRoot(this, mainPageType);
     }

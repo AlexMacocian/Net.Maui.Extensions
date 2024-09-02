@@ -20,7 +20,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
-    <Version>0.2.7</Version>
+    <Version>0.2.8</Version>
     <Authors>Alexandru Macocian</Authors>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
