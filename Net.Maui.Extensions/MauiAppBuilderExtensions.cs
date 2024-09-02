@@ -67,7 +67,7 @@ public static class MauiAppBuilderExtensions
     public static MauiAppBuilder WithPages(this MauiAppBuilder appBuilder)
     {
         appBuilder.ThrowIfNull();
-        foreach (var pageType in Assembly.GetCallingAssembly()?.GetTypes()?.Where(t => t.IsAssignableTo(typeof(ContentPage))) ?? [])
+        foreach (var pageType in Assembly.GetCallingAssembly()?.GetTypes()?.Where(t => t.IsAssignableTo(typeof(ContentPage)) && !t.IsAbstract && !t.IsInterface) ?? [])
         {
             appBuilder.Services.AddScoped(pageType);
             appBuilder.Services.AddScoped(typeof(ContentPage), sp => sp.GetRequiredService(pageType));
