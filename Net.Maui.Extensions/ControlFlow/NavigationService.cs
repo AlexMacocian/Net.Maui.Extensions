@@ -54,8 +54,8 @@ internal sealed class NavigationService : INavigationService
     }
 
     public TPageType GoTo<TPageType, TViewModelType>(TViewModelType? viewModel = default)
-        where TPageType : ContentPage
-        where TViewModelType : INotifyPropertyChanged, new()
+        where TPageType : ContentPage, IPageViewModel<TViewModelType>
+        where TViewModelType : class, INotifyPropertyChanged, new()
     {
         var scopedLogger = this.logger.CreateScopedLogger();
         scopedLogger.LogDebug($"Going to {typeof(TPageType).Name}");
