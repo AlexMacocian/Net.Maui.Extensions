@@ -53,6 +53,22 @@ internal sealed class NavigationService : INavigationService
         this.ShowCurrentPage();
     }
 
+    public void GoBackTo<TPageType>() where TPageType : ContentPage
+    {
+        var scopedLogger = this.logger.CreateScopedLogger();
+        scopedLogger.LogDebug($"Going back to {typeof(TPageType).Name}");
+        while (
+            this.navigationStack.Count > 1 &&
+            this.navigationStack.TryPeek(out var context) &&
+            context.Page is not TPageType)
+        {
+            this.navigationStack.Pop();
+            context.Scope?.Dispose();
+        }
+
+        this.ShowCurrentPage();
+    }
+
     public TPageType GoTo<TPageType, TViewModelType>(TViewModelType? viewModel = default)
         where TPageType : ContentPage, IPageViewModel<TViewModelType>
         where TViewModelType : class, INotifyPropertyChanged, new()

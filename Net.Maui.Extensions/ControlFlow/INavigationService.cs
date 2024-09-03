@@ -12,5 +12,8 @@ public interface INavigationService
 
     void GoBack();
 
+    void GoBackTo<TPageType>()
+        where TPageType : ContentPage;
+
     void GoBackToRoot();
 }
