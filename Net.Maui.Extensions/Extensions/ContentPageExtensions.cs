@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Core.Extensions;
 using System.Extensions;
 
-namespace Net.Maui.Extensions.Extensions;
+namespace Net.Maui.Extensions;
 
 public static class ContentPageExtensions
 {
