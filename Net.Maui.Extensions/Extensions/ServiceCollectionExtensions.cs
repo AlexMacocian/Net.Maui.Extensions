@@ -4,7 +4,7 @@ namespace Net.Maui.Extensions.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IHttpClientBuilder RegisterHttpClient<TService>(this IServiceCollection services)
+    public static IHttpClientBuilder AddHttpClient<TService>(this IServiceCollection services)
         where TService : class
     {
         return services.ThrowIfNull()
