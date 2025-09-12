@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path=".github/CODEOWNERS" />
+    <File Path=".github/dependabot.yml" />
+  </Folder>
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/cd.yaml" />
+    <File Path=".github/workflows/ci.yaml" />
+    <File Path=".github/workflows/gitlab-mirror.yaml" />
+  </Folder>
+  <Project Path="Net.Maui.Extensions/Net.Maui.Extensions.csproj">
+    <Deploy />
+  </Project>
+</Solution>
