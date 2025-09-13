@@ -20,7 +20,7 @@ jobs:
 
     env:
       Configuration: Release
-      Solution_Path: Net.Maui.Extensions.sln
+      Solution_Path: Net.Maui.Extensions.slnx
       Source_Project_Path: Net.Maui.Extensions\Net.Maui.Extensions.csproj
       Actions_Allow_Unsecure_Commands: true
 
